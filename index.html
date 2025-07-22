@@ -2,57 +2,131 @@
 <html lang="zh-cn">
 
 <head>
-    <title>m3u8播放器</title>
+    <title>M3U8播放器 - 在线视频流播放</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="M3U8Player播放器，用于m3u8文件的在线播放">
-
+    <meta name="description" content="M3U8Player播放器，用于m3u8文件的在线播放，支持HLS流媒体">
+    <link rel="icon" href="./images/logo.ico" type="image/x-icon">
+    
+    <!-- 引入现代化UI框架 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- jQuery库 -->
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
-
-    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-
+    
+    <!-- 社交分享组件 -->
     <link rel="stylesheet" href="https://cdn.staticfile.org/social-share.js/1.0.16/css/share.min.css">
     <script src="https://cdn.staticfile.org/social-share.js/1.0.16/js/social-share.min.js"></script>
+    
+    <!-- 广告脚本 -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
      crossorigin="anonymous"></script>
+     
+    <!-- 腾讯播放器 -->
     <link href="https://web.sdk.qcloud.com/player/tcplayer/release/v5.1.0/tcplayer.min.css" rel="stylesheet" />
     <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v5.1.0/tcplayer.v5.1.0.min.js"></script>
 
  
 
     <style>
-
-        @media screen and (max-width: 640px){
-            #player-container-id {
-                height: 200px!important;
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        /* 广告容器 */
+        .ad-container {
+            margin: 20px 0;
+            text-align: center;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            box-shadow: var(--box-shadow);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 顶部广告 */
+        .ad-top {
+            margin-bottom: 25px;
+        }
+        
+        /* 播放器前广告 */
+        .ad-before-player {
+            margin-bottom: 20px;
+        }
+        
+        /* 中间广告 */
+        .ad-middle {
+            margin: 30px 0;
+        }
+        
+        /* 底部广告 */
+        .ad-bottom {
+            margin-top: 30px;
+            margin-bottom: 25px;
+        }
+        
+        /* 响应式广告调整 */
+        @media (max-width: 768px) {
+            .ad-container {
+                padding: 8px;
+                min-height: 80px;
             }
         }
         
-        html, body{
+        @media screen and (max-width: 640px){
+            #player-container-id {
+                height: 220px!important;
+            }
+            .main h1 {
+                font-size: 24px;
+            }
+        }
+        
+        html, body {
             width: 100%;
             height: 100%;
             display: block;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background-color: var(--light-bg);
         }
 
         .hd {
             width: 100%;
-            height: 50px;
-            background-color: #0e90d2;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .hd .link-list {
-            padding: 0 16px;
-            height: 50px;
+            padding: 0 20px;
+            height: 60px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1140px;
             margin: 0 auto;
             display: flex;
             flex-direction: row;
-            gap: 24px;
+            gap: 30px;
             align-items: center;
-            align-content: center;
         }
 
         .hd .link-list a {
@@ -60,73 +134,249 @@
             color: #fff;
             text-decoration: none;
             cursor: pointer;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
         }
 
         .hd .link-list a:hover {
-            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .main {
-            padding: 16px 16px;
+            padding: 30px 20px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1140px;
             margin: 0 auto;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .main h1 {
             text-align: center;
-            font-size: 30px;
-            color: #0e90d2;
-            font-weight: 800;
-            margin-bottom: 24px;
+            font-size: 32px;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .main h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
         }
 
         .main .form {
             width: 100%;
             display: flex;
             flex-direction: row;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
         }
 
         .main .form input {
             flex: 1;
-            height: 40px;
-            border-top: 1px solid #0e90d2;
-            border-left: 1px solid #0e90d2;
-            border-bottom: 1px solid #0e90d2;
-            border-right: 0px;
-            padding-left: 10px;
+            height: 50px;
+            border: none;
+            padding: 0 15px;
+            font-size: 16px;
+            background-color: #fff;
         }
 
         .main .form input:focus {
-            outline: #0e90d2;
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-color);
         }
 
-        .main .form img {
-            margin-left: -4px;
-            width: 40px;
-            height: 40px;
+        .main .form button {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
             cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main .form button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .main .form button i {
+            font-size: 20px;
+        }
+
+        .player-wrapper {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
         }
 
         .main #share {
             text-align: center;
-            margin-top: 24px;
-            margin-bottom: 24px;
+            margin-top: 30px;
+            margin-bottom: 30px;
         }
 
         .main p {
-            font-size: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #555;
         }
 
+        .main .alert {
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            border: none;
+            background-color: #e7f5ff;
+            border-left: 4px solid var(--accent-color);
+        }
+        
         .main .alert a {
-            color: #501445;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .main .alert a:hover {
             text-decoration: underline;
         }
 
         .main h2 {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-color);
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+        
+        .footer p {
+            margin-bottom: 10px;
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 8px;
+            transition: var(--transition);
+        }
+        
+        .footer a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        .quote {
+            font-style: italic;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .quote:before {
+            content: '"';
+            font-size: 40px;
+            color: var(--accent-color);
+            position: absolute;
+            left: 10px;
+            top: 0;
+            opacity: 0.5;
+        }
+        
+        /* 提示框样式 */
+        .tooltip-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 300px;
+            animation: fadeInDown 0.3s ease-out;
+        }
+        
+        .tooltip-content {
+            padding: 12px 16px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tooltip-content i {
+            font-size: 18px;
+        }
+        
+        .tooltip-content i.bi-info-circle-fill {
+            color: var(--primary-color);
+        }
+        
+        .tooltip-content i.bi-exclamation-triangle-fill {
+            color: #ffc107;
+        }
+        
+        .tooltip-content i.bi-x-circle-fill {
+            color: #dc3545;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
         }
     </style>
 
@@ -137,82 +387,141 @@
 
     <header class="hd">
         <div class="link-list">
-            <a href="/">首页</a>
-            <a href="/about.html">关于</a>
+            <a href="/"><i class="bi bi-house-fill"></i> 首页</a>
+            <a href="/about.html"><i class="bi bi-info-circle-fill"></i> 关于</a>
         </div>
     </header>
 
     <div class="main">
-        <h1>m3u8在线播放器</h1>
-
+        <h1><i class="bi bi-play-circle-fill"></i> M3U8在线播放器</h1>
+        
+        <!-- 顶部广告 -->
+        <div class="ad-container ad-top">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
+                crossorigin="anonymous"></script>
+            <!-- m3u-top -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-6400746346592229"
+                data-ad-slot="2580436382"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
 
         <div class="form">
-            <input type="text" id="url"  value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" placeholder="请输入m3u8播放地址" autocomplete="off">
-            <img src="./images/ic-play.png" onclick="play()"/>
+            <input type="text" id="url" value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" placeholder="请输入m3u8播放地址" autocomplete="off">
+            <button type="button" onclick="play()"><i class="bi bi-play-fill"></i></button>
         </div>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
-     crossorigin="anonymous"></script>
-<!-- m3u -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-6400746346592229"
-     data-ad-slot="2580436382"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-        <video id="player-container-id"  preload="auto" playsinline webkit-playsinline style="width: 100%;min-height:200px; background:#000;">
-        </video> 
+<!-- 播放器上方广告 -->
+        <div class="ad-container ad-before-player">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
+                crossorigin="anonymous"></script>
+            <!-- m3u-before-player -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-6400746346592229"
+                data-ad-slot="3691547693"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+<div class="player-wrapper">
+            <video id="player-container-id" preload="auto" playsinline webkit-playsinline style="width: 100%;min-height:200px; background:#000;">
+            </video>
+        </div>
+        
+        <!-- 提示框组件 -->
+        <div id="tooltip" class="tooltip-container" style="display: none;">
+            <div class="tooltip-content">
+                <i id="tooltip-icon" class="bi"></i>
+                <span id="tooltip-message"></span>
+            </div>
+        </div>
+        
+        <!-- 广告区域 -->
+        <div class="ad-container ad-middle">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
+                crossorigin="anonymous"></script>
+            <!-- m3u-middle -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-6400746346592229"
+                data-ad-slot="5168264924"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
 
 
-        <div class="alert alert-success" role="alert">
-            <p>
-                嵌入网站:
-            </p>
-            <p>
+        <div class="alert" role="alert">
+            <h2><i class="bi bi-code-slash"></i> 嵌入网站</h2>
             <pre>&lt;iframe src="https://m3u8player.org/player.html?url=https://****index.m3u8"&gt;&lt;/iframe&gt;</pre>
-            </p>
+            
+            <h2><i class="bi bi-info-circle"></i> 关于M3U8播放器</h2>
             <p>
                 M3U8Player 是一款实现 HTTP 实时流客户端的 Chrome 浏览器扩展工具。你可以播放 .m3u8 HTTP Live Streaming (HLS)。它依靠 HTML5
                 视频和媒体源扩展进行播放。它的工作原理是将 MPEG-2 传输流和 AAC/MP3 流转换成 ISO BMFF (MP4) 片段。如果浏览器中有 Web Worker，可使用它异步执行转码。它还支持 HLS
                 + fmp4。
             </p>
-            <h2>什么是m3u8文件?</h2>
+            
+            <h2><i class="bi bi-file-earmark-text"></i> 什么是m3u8文件?</h2>
             <p>
-                文件扩展名为 <a href="https://en.wikipedia.org/wiki/M3U#M3U8">M3U8</a> 的文件是一种 UTF-8 编码的音频播放列表文件。它们是纯文本文件，音频和视频播放器都可以用它们来描述媒体文件的位置。
+                文件扩展名为 <a href="https://en.wikipedia.org/wiki/M3U#M3U8" target="_blank">M3U8</a> 的文件是一种 UTF-8 编码的音频播放列表文件。它们是纯文本文件，音频和视频播放器都可以用它们来描述媒体文件的位置。
+            </p>
             <p>
                 例如，一个 M3U8 文件可能会提供互联网电台的在线文件参考。另一个文件可能是在你的电脑上创建的，用于为你的个人音乐或一系列视频建立播放列表。
+            </p>
             <p>
                 无论哪种方式，效果都是一样的：你可以打开文件，快速轻松地开始播放播放列表指向的内容。如果你发现自己想反复听同一首歌，你可以制作一个 M3U8 文件，作为在媒体播放器中播放这些特定曲目的快捷方式。
+            </p>
             <p>
                 文件可以使用绝对路径、相对路径和 URL 来指向特定的媒体文件和/或媒体文件的整个文件夹。文件中的其他信息可能是描述文件内容的注释。
-
-            <p>
-                M3U8是一种播放多媒体列表的文件格式，它的设计初衷是为了播放音频文件，比如MP3，但是越来越多的软件现在用来播放视频文件列表，M3U8也可以指定在线流媒体音频源。很多<a href="http://m3u8player.org">播放器</a>和软件都支持M3U8文件格式。
             </p>
-
+            <p>
+                M3U8是一种播放多媒体列表的文件格式，它的设计初衷是为了播放音频文件，比如MP3，但是越来越多的软件现在用来播放视频文件列表，M3U8也可以指定在线流媒体音频源。很多<a href="http://m3u8player.org" target="_blank">播放器</a>和软件都支持M3U8文件格式。
+            </p>
         </div>
 
-        <p>
-            <span>"If something is important enough, even if the odds are against you, you should still do it."
-                <br />如果一件事情对你很重要，即使成功的概率很小，你也应该去做 —— <strong>埃隆马斯克</strong>
-            </span>
-            <br>
-            <br>
-            <br>
-            <span style="font-size: 14px;">资源来源于网络，如有侵权，请联系客服予以删除！</span>
-            <br>
+        <div class="quote">
+            <p>"If something is important enough, even if the odds are against you, you should still do it."</p>
+            <p>如果一件事情对你很重要，即使成功的概率很小，你也应该去做 —— <strong>埃隆马斯克</strong></p>
+        </div>
 
-            <span style="font-size: 14px;">© 2019 - 2025 </span>
- 
-            <p>友情链接：
-                <a href="https://www.zmweb3.com">zmweb3</a>  | 
-                <a href="https://tool.zmweb3.com">web3工具箱</a> | 
-                <a href="https://4.laoyan.me/">web3导航</a> | 
-                <a href="https://www.xhmail.org/">m3u8播放器</a>
+        <!-- 底部广告 -->
+        <div class="ad-container ad-bottom">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6400746346592229"
+                crossorigin="anonymous"></script>
+            <!-- m3u-bottom -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-6400746346592229"
+                data-ad-slot="6644983255"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <div class="footer">
+            <p><i class="bi bi-exclamation-triangle"></i> 资源来源于网络，如有侵权，请联系客服予以删除！</p>
+            <p>© 2019 - 2025 M3U8在线播放器</p>
+            <p class="links">
+                <strong>友情链接：</strong>
+                <a href="https://www.zmweb3.com" target="_blank">zmweb3</a> | 
+                <a href="https://tool.zmweb3.com" target="_blank">web3工具箱</a> | 
+                <a href="https://4.laoyan.me/" target="_blank">web3导航</a> | 
+                <a href="https://www.xhmail.org/" target="_blank">m3u8播放器</a>
             </p>
-        </p>
+        </div>
 
     </div>
  
@@ -220,31 +529,107 @@
  
 
     <script>
-
+        // 初始化播放器变量
+        let player;
         
-        var player = undefined;
-
-
-        function play() {
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为输入框添加回车键事件监听
+            document.getElementById('url').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    play();
+                }
+            });
             
-            let url = $("#url").val()
-
-            if(player === undefined) {
-                player = TCPlayer('player-container-id', {
-                sources: [{
-                    src: url,
-                }],
-                // licenseUrl需自己去腾讯云申请
-                licenseUrl: 'https://license.vod2.myqcloud.com/license/v2/1258161798_1/v_cube.license',
-            }); 
+            // 显示初始提示信息
+            showTooltip('输入M3U8地址后点击播放按钮或按回车键开始播放');
+        });
+        
+        // 播放函数
+        function play() {
+            const url = document.getElementById('url').value.trim();
+            
+            if (!url) {
+                showTooltip('请输入有效的M3U8地址', 'warning');
+                return;
             }
-
-
-            player.pause();
-            console.log(url)
-            player.src(url); // url 播放地址
+            
+            try {
+                if (!player) {
+                    // 初始化播放器
+                    player = TCPlayer('player-container-id', {
+                        sources: [{
+                            src: url,
+                        }],
+                        // licenseUrl需自己去腾讯云申请
+                        licenseUrl: 'https://license.vod2.myqcloud.com/license/v2/1258161798_1/v_cube.license',
+                        autoplay: true,
+                        poster: '', // 可以添加封面图
+                        controls: true,
+                        playbackRates: [0.5, 1, 1.25, 1.5, 2] // 播放速率选项
+                    });
+                    
+                    // 添加播放器事件监听
+                    player.on('error', function() {
+                        showTooltip('视频加载失败，请检查地址是否正确', 'error');
+                    });
+                    
+                    player.on('playing', function() {
+                        showTooltip('视频播放中');
+                    });
+                } else {
+                    // 如果播放器已存在，更新视频源
+                    player.pause();
+                    player.src(url);
+                }
+                
+                // 显示加载提示
+                showTooltip('正在加载视频...');
+                
+            } catch (error) {
+                console.error('播放器初始化失败:', error);
+                showTooltip('播放器初始化失败', 'error');
+            }
         }
-
+        
+        // 显示提示信息
+        function showTooltip(message, type = 'info') {
+            // 记录到控制台
+            console.log(`[${type}] ${message}`);
+            
+            // 获取提示框元素
+            const tooltip = document.getElementById('tooltip');
+            const tooltipMessage = document.getElementById('tooltip-message');
+            const tooltipIcon = document.getElementById('tooltip-icon');
+            
+            // 设置提示内容
+            tooltipMessage.textContent = message;
+            
+            // 根据类型设置图标
+            tooltipIcon.className = 'bi';
+            switch(type) {
+                case 'warning':
+                    tooltipIcon.classList.add('bi-exclamation-triangle-fill');
+                    break;
+                case 'error':
+                    tooltipIcon.classList.add('bi-x-circle-fill');
+                    break;
+                default:
+                    tooltipIcon.classList.add('bi-info-circle-fill');
+            }
+            
+            // 显示提示框
+            tooltip.style.display = 'block';
+            tooltip.style.animation = 'fadeInDown 0.3s ease-out';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                tooltip.style.animation = 'fadeOut 0.5s ease-out';
+                setTimeout(() => {
+                    tooltip.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
     </script>
 
 </body>
